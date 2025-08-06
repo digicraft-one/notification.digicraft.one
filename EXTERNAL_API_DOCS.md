@@ -2,7 +2,7 @@
 
 This document describes how to use the external API endpoint to send notifications from your applications.
 
-## 🔗 **External API Endpoint**
+## 🔗 **External API Endpoints**
 
 ### **Send Notification**
 ```
@@ -10,6 +10,13 @@ POST /api/external/send-notification
 ```
 
 **URL:** `http://your-domain.com/api/external/send-notification`
+
+### **Get Notifications**
+```
+GET /api/external/get-notifications
+```
+
+**URL:** `http://your-domain.com/api/external/get-notifications`
 
 ## 🔐 **Authentication**
 
@@ -24,13 +31,15 @@ The API key should match your `NEXT_PUBLIC_NOTIFICATION_SECRET` environment vari
 
 ## 📝 **Request Format**
 
-### **Headers:**
+### **Send Notification**
+
+#### **Headers:**
 ```
 Content-Type: application/json
 x-api-key: your-notification-secret
 ```
 
-### **Request Body:**
+#### **Request Body:**
 ```json
 {
   "title": "Notification Title",
@@ -45,7 +54,7 @@ x-api-key: your-notification-secret
 }
 ```
 
-### **Parameters:**
+#### **Parameters:**
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -55,9 +64,26 @@ x-api-key: your-notification-secret
 | `sender` | string | ❌ | Name of the application sending the notification |
 | `tokens` | array | ❌ | **Optional override** - specific FCM tokens to send to (if not provided, uses `FCM_TOKEN` from environment) |
 
+### **Get Notifications**
+
+#### **Headers:**
+```
+x-api-key: your-notification-secret
+```
+
+#### **Query Parameters:**
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `page` | number | ❌ | Page number (default: 1) |
+| `limit` | number | ❌ | Number of notifications per page (default: 10) |
+| `source` | string | ❌ | Filter by source ('external-api', 'dashboard') |
+| `sender` | string | ❌ | Filter by sender/app name |
+| `status` | string | ❌ | Filter by status ('sent', 'failed') |
+
 ## 📤 **Response Format**
 
-### **Success Response:**
+### **Send Notification - Success Response:**
 ```json
 {
   "success": true,
@@ -80,6 +106,41 @@ x-api-key: your-notification-secret
 }
 ```
 
+### **Get Notifications - Success Response:**
+```json
+{
+  "success": true,
+  "notifications": [
+    {
+      "id": "mongodb_object_id",
+      "title": "Notification Title",
+      "body": "Notification message",
+      "data": {
+        "customKey": "customValue",
+        "action": "open_app"
+      },
+      "sender": "Your App Name",
+      "source": "external-api",
+      "successCount": 2,
+      "failureCount": 0,
+      "status": "sent",
+      "createdAt": "2024-01-01T12:00:00.000Z"
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "limit": 10,
+    "total": 25,
+    "pages": 3
+  },
+  "filters": {
+    "source": "external-api",
+    "sender": null,
+    "status": null
+  }
+}
+```
+
 ### **Error Response:**
 ```json
 {
@@ -91,6 +152,8 @@ x-api-key: your-notification-secret
 ## 💻 **Code Examples**
 
 ### **JavaScript/Node.js:**
+
+#### **Send Notification:**
 ```javascript
 const sendNotification = async (title, body, data = {}, sender = null, tokens = null) => {
   const API_KEY = 'your-notification-secret';
@@ -133,6 +196,52 @@ sendNotification('Hello!', 'This is a test notification', {
 }, 'My App', ['fcm_token_1', 'fcm_token_2']);
 ```
 
+#### **Get Notifications:**
+```javascript
+const getNotifications = async (params = {}) => {
+  const API_KEY = 'your-notification-secret';
+  const API_URL = 'http://your-domain.com/api/external/get-notifications';
+  
+  try {
+    const queryParams = new URLSearchParams(params).toString();
+    const url = queryParams ? `${API_URL}?${queryParams}` : API_URL;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'x-api-key': API_KEY
+      }
+    });
+    
+    const result = await response.json();
+    return result;
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    throw error;
+  }
+};
+
+// Usage examples
+// Get all notifications
+const allNotifications = await getNotifications();
+
+// Get first page with 5 notifications
+const firstPage = await getNotifications({ page: 1, limit: 5 });
+
+// Get external API notifications only
+const externalNotifications = await getNotifications({ source: 'external-api' });
+
+// Get notifications from specific sender
+const senderNotifications = await getNotifications({ sender: 'My App' });
+
+// Get notifications with multiple filters
+const filteredNotifications = await getNotifications({ 
+  source: 'external-api', 
+  limit: 3,
+  page: 1
+});
+```
+
 ### **Python:**
 ```python
 import requests
@@ -171,6 +280,8 @@ print(result)
 ```
 
 ### **cURL:**
+
+#### **Send Notification:**
 ```bash
 # Send to environment tokens (default)
 curl -X POST http://your-domain.com/api/external/send-notification \
@@ -199,6 +310,29 @@ curl -X POST http://your-domain.com/api/external/send-notification \
     "sender": "My App",
     "tokens": ["fcm_token_1", "fcm_token_2"]
   }'
+```
+
+#### **Get Notifications:**
+```bash
+# Get all notifications
+curl -X GET "http://your-domain.com/api/external/get-notifications" \
+  -H "x-api-key: your-notification-secret"
+
+# Get first page with 5 notifications
+curl -X GET "http://your-domain.com/api/external/get-notifications?page=1&limit=5" \
+  -H "x-api-key: your-notification-secret"
+
+# Get external API notifications only
+curl -X GET "http://your-domain.com/api/external/get-notifications?source=external-api" \
+  -H "x-api-key: your-notification-secret"
+
+# Get notifications from specific sender
+curl -X GET "http://your-domain.com/api/external/get-notifications?sender=My%20App" \
+  -H "x-api-key: your-notification-secret"
+
+# Get notifications with multiple filters
+curl -X GET "http://your-domain.com/api/external/get-notifications?source=external-api&limit=3&page=1" \
+  -H "x-api-key: your-notification-secret"
 ```
 
 ### **PHP:**
@@ -249,10 +383,13 @@ print_r($result);
 
 ## 🧪 **Testing**
 
-### **Test the API:**
+### **Test the APIs:**
 ```bash
-# Run the test script
+# Test send notification API
 node scripts/test-external-api.js
+
+# Test get notifications API
+node scripts/test-external-get-notifications.js
 ```
 
 ### **Manual Testing:**

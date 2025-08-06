@@ -16,7 +16,7 @@ async function setupUser() {
     const usersCollection = db.collection('users');
     
     // Check if admin user already exists
-    const existingUser = await usersCollection.findOne({ username: 'admin' });
+    const existingUser = await usersCollection.findOne({ username: 'admin@digicraft.one' });
     
     if (existingUser) {
       console.log('Admin user already exists');
@@ -24,10 +24,10 @@ async function setupUser() {
     }
     
     // Create admin user
-    const hashedPassword = bcrypt.hashSync('admin123', 10);
+    const hashedPassword = bcrypt.hashSync('N4&vQ2!p6@33', 10);
     
     const adminUser = {
-      username: 'admin',
+      username: 'admin@digicraft.one',
       password: hashedPassword,
       role: 'admin',
       createdAt: new Date()
@@ -35,8 +35,8 @@ async function setupUser() {
     
     await usersCollection.insertOne(adminUser);
     console.log('Admin user created successfully');
-    console.log('Username: admin');
-    console.log('Password: admin123');
+    console.log('Username: admin@digicraft.one');
+    console.log('Password: N4&vQ2!p6@33');
     
   } catch (error) {
     console.error('Error setting up user:', error);
