@@ -1,0 +1,49 @@
+# Copy this content to your .env.local file
+# Notification System Environment Variables
+
+# =============================================================================
+# FCM (Firebase Cloud Messaging) Configuration
+# =============================================================================
+
+# FCM Tokens (comma-separated list of device tokens)
+FCM_TOKEN=token1,token2,token3
+
+# =============================================================================
+# Firebase Admin SDK Credentials
+# =============================================================================
+
+# Your Firebase project ID
+FIREBASE_PROJECT_ID=your-firebase-project-id
+
+# Firebase service account email
+FIREBASE_CLIENT_EMAIL=firebase-adminsdk-xxxxx@your-project.iam.gserviceaccount.com
+
+# Firebase private key (keep the quotes and \n characters)
+FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYour-Firebase-Private-Key-Here\n-----END PRIVATE KEY-----\n"
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+
+# MongoDB connection string
+MONGODB_URI=mongodb://localhost:27017/notification-system
+
+# =============================================================================
+# Authentication & Security
+# =============================================================================
+
+# JWT secret for user authentication (dashboard login)
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
+
+# Secret key for internal API authentication (dashboard)
+NOTIFICATION_SECRET=your-notification-secret-key-change-this
+
+# Public secret key for external API authentication (same as NOTIFICATION_SECRET)
+NEXT_PUBLIC_NOTIFICATION_SECRET=your-notification-secret-key-change-this
+
+# =============================================================================
+# Optional: Backend URL for external applications
+# =============================================================================
+
+# Base URL for your notification service (for external API calls)
+NEXT_PUBLIC_BACKEND_URL=http://localhost:3000 
